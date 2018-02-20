@@ -1,0 +1,75 @@
+body{
+    font-family: 'Dancing Script', cursive;
+}
+.gridContainer{
+    display:grid;
+    grid-gap:0;
+    grid-template-columns:auto;
+    text-align:left;
+}
+.cardHolder{
+    display:grid;
+    grid-template-columns:155px 155px 155px 155px;
+}
+#title {
+    text-align:center;
+    color:rgb(230, 8, 182);
+    font-weight:bold;
+}
+.topChoices{
+    height:125px;
+}
+.yourChoice{
+    height:125px;
+    margin-bottom:0px;
+    cursor: url("../images/hand-cursor-32.png"), pointer;
+
+}
+.enemiesAvailable{
+    height:125px;
+}
+.attack{
+    width:100px;
+}
+.defender{
+    height:125px;
+}
+.stats{
+    height:50px;
+}
+.pic{
+    height:75px;
+    width:100px;
+    border:white solid 4px;
+    margin-left:10px;
+    margin-bottom:0px;
+   
+}
+#choose{
+    font-size:20pt;
+    margin-top:0px;
+    font-weight:bold;
+}
+
+.barbieFrame{
+    width: 120px;
+    margin: 0 auto;
+}
+.card {
+    width: 150px;
+    text-align: center;
+    align-content: center;
+    cursor: url("../images/hand-cursor-32.png"), pointer;
+}
+.unselected-card{
+    border: white solid 1px;
+    background:rgb(240, 190, 229);
+}
+h3{
+    width:600px;
+    text-align:center;
+    margin-bottom:0px;
+}
+.hidden{
+    display:none;
+}
