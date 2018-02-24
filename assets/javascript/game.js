@@ -111,6 +111,10 @@ function resetHPtoBaseHP(section){
         $(singleBarbieCard).children(".hitPoints").html(baseHP);
     }
 }
-
-// //function take a parameter of new hit points and needs to change current
-// hit points of yourchoicebarbe
+function setTargetBarbieHP(newHitPoints){
+    var yourSelection = $(".yourChoice");
+    var yourSelectionKids = $(yourSelection).children(".card");
+    var yourSelectionBarbie = yourSelectionKids[targetBarbieIndex];
+    $(yourSelectionBarbie).children(".hitPoints").html(newHitPoints);
+}
+// when barbie gets hit this sets new points after attack power decrease
