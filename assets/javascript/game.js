@@ -66,15 +66,29 @@ $(document).ready(function () {
 
                 if(defenderCount === 0){
                     $(".stats").append("<br>You have defeated all your frenemies!");
+                    $("#newgame").show();
+                    $("#attack").hide();
                 }
             }
             else {
-                //counter attack
+                var defenderBarbieCounterAttack = getBarbieStat(defenderBarbie, "ca");
+                targetBarbieHp = targetBarbieHp - defenderBarbieCounterAttack;
+                setHitPoints(targetBarbie, targetBarbieHp);
+                
+                if(targetBarbieHp <= 0){
+                    $(".stats").text("You were defeated by " + getBarbieStat(defenderBarbie, "name"));
+                    $("#newgame").show();
+                    $("#attack").hide();
+                }
             }
 
 
         }
 
+    })
+
+    $("#newgame").on("click", function(){
+        resetGame();
     })
 
 })
@@ -117,8 +131,8 @@ function resetGame() {
     setHitPoints(targetBarbie, getBarbieStat(targetBarbie, "baseHP"));
     setAttackPower(targetBarbie, getBarbieStat(targetBarbie, "baseAP"));
     $(targetBarbie).hide();
-    
 
+    
     //Change Visibility to Defaults
     $(".topChoices").show();
     $(".yourChoice").children(".card").hide();
@@ -126,4 +140,13 @@ function resetGame() {
     $(frenemyBarbies).hide();
     $(defenderBarbies).hide();
 
+    $("#stats").text("");
+
+    if(defenderBarbie != null){
+        setHitPoints(defenderBarbie, getBarbieStat(defenderBarbie, "baseHP"));
+    }
+    defenderBarbie = null;
+    targetBarbie = null;
+    $("#newgame").hide();
+    $("#attack").show();
 }
