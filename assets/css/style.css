@@ -37,6 +37,10 @@ body{
 }
 .stats{
     height:50px;
+    font-size:30pt;
+    font-weight:bold;
+    color:rgb(237, 250, 123);
+    text-align:center;
 }
 .pic{
     height:75px;

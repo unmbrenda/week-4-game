@@ -131,6 +131,7 @@ function resetGame() {
     setHitPoints(targetBarbie, getBarbieStat(targetBarbie, "baseHP"));
     setAttackPower(targetBarbie, getBarbieStat(targetBarbie, "baseAP"));
     $(targetBarbie).hide();
+    defenderCount = 3;
 
     
     //Change Visibility to Defaults
