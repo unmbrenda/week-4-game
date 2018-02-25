@@ -1,120 +1,152 @@
-//global variables
+//targetBarbie is the player's chosen barbie
+var targetBarbie = null;
 
-var targetBarbieIndex = -1;
-var targetDefenderBarbieIndex = -1;
+//defenderBarbie is the current defender
+var defenderBarbie = null;
+var defenderCount = 3;
 
-$(".topChoices").on("click", ".card", function () {
-    var originals = $(".topChoices").children(".card");
-    var targetBarbie = getBarbieName(this);
-    for (var i = 0; i < originals.length; i++) {
-        if (getBarbieName(originals[i]) === targetBarbie) {
-            targetBarbieIndex = i;
-            break;
+var choiceBarbies = $('.topChoices').children(".card");
+var yourChoiceBarbies = $('.yourChoice').children(".card");
+var frenemyBarbies = $(".enemiesAvailable").children(".card");
+var defenderBarbies = $(".defender").children(".card");
+
+$(document).ready(function () {
+
+    $(".topChoices").on("click", ".card", function () {
+        var barbieIndex = $(choiceBarbies).index(this);
+        targetBarbie = yourChoiceBarbies[barbieIndex];
+
+        $(targetBarbie).show();
+        $(".topChoices").hide();
+        $(".yourChoice").show();
+        $(".topChoiceLabel").hide();
+
+        $(frenemyBarbies).show();
+        var defenderClone = frenemyBarbies[barbieIndex];
+        $(defenderClone).hide();
+
+    })
+
+    $(".enemiesAvailable").on("click", ".card", function () {
+        if (defenderBarbie === null) {
+            var barbieIndex = $(".enemiesAvailable").children().index(this);
+            defenderBarbie = $(".defender").children(".card")[barbieIndex];
+
+            $(defenderBarbie).show();
+            var frenemyBarbie = $(".enemiesAvailable").children(".card")[barbieIndex];
+            $(frenemyBarbie).hide();
         }
-    }
-    var yourSelection = $(".yourChoice");
-    var yourSelectionKids = $(yourSelection).children(".card");
-    var yourSelectionBarbie = yourSelectionKids[targetBarbieIndex];
-    $(yourSelectionBarbie).show();
+    })
 
-
-    var enemySelection = $(".enemiesAvailable");
-    var enemySelectionKids = $(enemySelection).children(".card");
-    for (var i = 0; i < enemySelectionKids.length; i++) {
-        if (i != targetBarbieIndex) {
-            var frenemy = enemySelectionKids[i];
-            $(frenemy).show();
+    $("#attack").on("click", function () {
+        if (defenderBarbie === null) {
+            $("#stats").html("No Enemies to Attack!");
         }
-    }
-    $(".topChoices").hide();
-    $(".topChoiceLabel").hide();
-});
+        else {
+            var targetBarbieHp = parseInt(getBarbieStat(targetBarbie, "hp"));
+            var targetBarbieAttack = parseInt(getBarbieStat(targetBarbie, "ap"));
+            var targetBarbieBaseAttack = parseInt(getBarbieStat(targetBarbie, "baseAP"));
 
-// create new onclick event
-$(".enemiesAvailable").on("click", ".card", function () {
-    var frenemies = $(".enemiesAvailable").children(".card");
-    var defenderBarbie = $(".defender");
+            var defenderBarbieHp = parseInt(getBarbieStat(defenderBarbie, "hp"));
+            var defenderBarbieAttack = parseInt(getBarbieStat(defenderBarbie, "ca"));
 
-    if (hasVisibleBarbie(defenderBarbie) === false) {
-        var targetBarbie = getBarbieName(this);
+            //target barbie gets first strike
+            defenderBarbieHp = defenderBarbieHp - targetBarbieAttack;
+            setHitPoints(defenderBarbie, defenderBarbieHp);
 
-        for (var i = 0; i < frenemies.length; i++) {
-            if (getBarbieName(frenemies[i]) === targetBarbie) {
-                targetDefenderBarbieIndex = i;
-                break;
+            if (defenderBarbieHp <= 0) {
+                defenderCount = defenderCount - 1;
+                setHitPoints(defenderBarbie, getBarbieStat(defenderBarbie, "baseHP"));
+                $(defenderBarbie).hide();
+                $(".stats").text("You defeated " + getBarbieStat(defenderBarbie, "name"));
+                defenderBarbie = null;
+
+                targetBarbieAttack = targetBarbieAttack + targetBarbieBaseAttack;
+                setAttackPower(targetBarbie, targetBarbieAttack);
+
+                if(defenderCount === 0){
+                    $(".stats").append("<br>You have defeated all your frenemies!");
+                    $("#newgame").show();
+                    $("#attack").hide();
+                }
             }
+            else {
+                var defenderBarbieCounterAttack = getBarbieStat(defenderBarbie, "ca");
+                targetBarbieHp = targetBarbieHp - defenderBarbieCounterAttack;
+                setHitPoints(targetBarbie, targetBarbieHp);
+                
+                if(targetBarbieHp <= 0){
+                    $(".stats").text("You were defeated by " + getBarbieStat(defenderBarbie, "name"));
+                    $("#newgame").show();
+                    $("#attack").hide();
+                }
+            }
+
+
         }
-        var yourDefenderKids = $(defenderBarbie).children(".card");
-        var yourDefenderBarbie = yourDefenderKids[targetDefenderBarbieIndex];
-        $(yourDefenderBarbie).show();
-        $(frenemies[targetDefenderBarbieIndex]).hide();
-    }
-//     $(".attack").on("click", function (){
 
-// }
-});
+    })
 
+    $("#newgame").on("click", function(){
+        resetGame();
+    })
 
-function getBarbieName(barbie) {
-    var barbieName = $(barbie).children(".barbieName").first().html();
-    return barbieName;
+})
 
-}
-// /section represents either .enemiesAvailable or defender
-function hasVisibleBarbie(section) {
-    var sectionKids = $(section).children(".card");
-    for (var i = 0; i < sectionKids.length; i++) {
-        if ($(sectionKids[i]).is(":visible")) {
-            return true;
-        }
-    }
-    return false;
-
-    // $($(".enemiesAvailable").children(".card")[2]).is(":visible");
-}
-function getTargetBarbieHP(){
-    var yourSelection = $(".yourChoice");
-    var yourSelectionKids = $(yourSelection).children(".card");
-    return $(yourSelectionKids[targetBarbieIndex]).attr("data-baseHP");
-}
-function getDefenderBarbieHP(){
-    var yourDefenderBarbie = $(".defender");
-    var yourDefenderKids = $(yourDefenderBarbie).children(".card");
-    return $(yourDefenderKids[targetDefenderBarbieIndex]).attr("data-baseHP");
-}
-function getTargetBarbieBaseAP(){
-    var yourSelection = $(".yourChoice");
-    var yourSelectionKids = $(yourSelection).children(".card");
-    return $(yourSelectionKids[targetBarbieIndex]).attr("data-baseAP");
-}
-function getDefenderBarbieBaseAP(){
-    var yourDefenderBarbie = $(".defender");
-    var yourDefenderKids = $(yourDefenderBarbie).children(".card");
-    return $(yourDefenderKids[targetDefenderBarbieIndex]).attr("data-baseAP");
-}
-function getTargetBarbieCounterAP(){
-    var yourSelection = $(".yourChoice");
-    var yourSelectionKids = $(yourSelection).children(".card");
-    return $(yourSelectionKids[targetBarbieIndex]).attr("data-counterAP");
-}
-function getDefenderBarbieCounterAP(){
-    var yourDefenderBarbie = $(".defender");
-    var yourDefenderKids = $(yourDefenderBarbie).children(".card");
-    return $(yourDefenderKids[targetDefenderBarbieIndex]).attr("data-counterAP");
-}
-function resetHPtoBaseHP(section){
-    var barbieCards = $(section).children(".card");
-    for (var i = 0; i < barbieCards.length; i++) {
-        var singleBarbieCard = barbieCards[i];
-        var baseHP = $(singleBarbieCard).attr("data-baseHP");
-        // var currentHP = $(singleBarbieCard).children(".hitPoints").html();
-        $(singleBarbieCard).children(".hitPoints").html(baseHP);
+function getBarbieStat(barbie, statName) {
+    switch (statName) {
+        case "hp": //Hit Points
+            return $(barbie).children(".hitPoints").first().text();
+            break;
+        case "ca": //Counter Attack
+            return $(barbie).attr("data-counterAP");
+            break;
+        case "ap": //Attack Powere
+            return $(barbie).attr("data-AP");
+            break;
+        case "baseAP":
+            return $(barbie).attr("data-baseAP");
+            break;
+        case "baseHP":
+            return $(barbie).attr("data-baseHP");
+        case "name":
+            return $(barbie).children(".barbieName").first().text();
+            break;
+        default:
+            break;
     }
 }
-function setTargetBarbieHP(newHitPoints){
-    var yourSelection = $(".yourChoice");
-    var yourSelectionKids = $(yourSelection).children(".card");
-    var yourSelectionBarbie = yourSelectionKids[targetBarbieIndex];
-    $(yourSelectionBarbie).children(".hitPoints").html(newHitPoints);
+
+function setHitPoints(barbie, newHitpoints) {
+    $(barbie).children(".hitPoints").first().text(newHitpoints);
 }
-// when barbie gets hit this sets new points after attack power decrease
+
+function setAttackPower(barbie, newAP){
+    $(barbie).attr("data-AP", newAP);
+}
+
+function resetGame() {
+
+    //Reset Hitpoints of Barbies
+    setHitPoints(targetBarbie, getBarbieStat(targetBarbie, "baseHP"));
+    setAttackPower(targetBarbie, getBarbieStat(targetBarbie, "baseAP"));
+    $(targetBarbie).hide();
+
+    
+    //Change Visibility to Defaults
+    $(".topChoices").show();
+    $(".yourChoice").children(".card").hide();
+    $(".topChoiceLabel").show();
+    $(frenemyBarbies).hide();
+    $(defenderBarbies).hide();
+
+    $("#stats").text("");
+
+    if(defenderBarbie != null){
+        setHitPoints(defenderBarbie, getBarbieStat(defenderBarbie, "baseHP"));
+    }
+    defenderBarbie = null;
+    targetBarbie = null;
+    $("#newgame").hide();
+    $("#attack").show();
+}
